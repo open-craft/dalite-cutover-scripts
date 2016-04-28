@@ -1,0 +1,33 @@
+- name: Set up servers
+  hosts: all
+  become: true
+  roles:
+    - name: common-server
+      COMMON_SERVER_NO_BACKUPS: true
+
+- name: Set up servers
+  hosts: all
+  become: true
+  tasks:
+    - name: install dependencies
+      apt: name={{item}}
+      with_items:
+        - python-swiftclient
+        - mysql-client
+        - python-pip
+
+    - name: install awscli
+      shell: pip install awscli
+
+    - name: template
+      template: src={{item}} dest=/home/ubuntu/{{item}} owner=ubuntu group=ubuntu mode=700
+      with_items:
+        - dump-data.sh
+        - restore-to-new-dalite.sh
+        - drop-database.sql
+        - openstackrc.sh
+        - dump-s3.sh
+        - download-logs.sh
+        - restore-data-swift.sh
+        - upload-logs.sh
+        - run-all.sh
